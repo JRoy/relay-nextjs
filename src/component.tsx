@@ -135,10 +135,25 @@ export function withRelay<Props extends RelayProps, ServerSideProps extends {}>(
 
     const [preloadedQuery, setPreloadedQuery] = useState(initialPreloadedQuery);
 
+    const prevInitialRef = useRef(initialPreloadedQuery);
+    useEffect(() => {
+      if (
+        initialPreloadedQuery &&
+        initialPreloadedQuery !== prevInitialRef.current
+      ) {
+        prevInitialRef.current = initialPreloadedQuery;
+        setPreloadedQuery((prev) => {
+          if (prev && prev !== initialPreloadedQuery) {
+            prev.dispose();
+          }
+          return initialPreloadedQuery;
+        });
+      }
+    }, [initialPreloadedQuery]);
+
     const isMountedRef = useRef(false);
     const env = useRelayEnvironment();
     useEffect(() => {
-      // Avoid re-setting the initial preloaded query on the first render.
       if (!isMountedRef.current) {
         isMountedRef.current = true;
         return;
@@ -151,9 +166,25 @@ export function withRelay<Props extends RelayProps, ServerSideProps extends {}>(
         queryOptions
       );
 
-      setPreloadedQuery(nextPreloadedQuery);
+      setPreloadedQuery((prev) => {
+        if (prev) {
+          prev.dispose();
+        }
+        return nextPreloadedQuery;
+      });
       return () => nextPreloadedQuery.dispose();
     }, [env, queryVariables, queryOptions]);
+
+    useEffect(() => {
+      return () => {
+        setPreloadedQuery((prev) => {
+          if (prev) {
+            prev.dispose();
+          }
+          return prev;
+        });
+      };
+    }, []);
 
     return preloadedQuery;
   }

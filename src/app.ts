@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-condition */
-import { useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Environment } from 'react-relay';
 import { loadQuery } from 'react-relay';
 import type { GraphQLSingularResponse } from 'relay-runtime';
@@ -10,19 +9,23 @@ export function useRelayNextjs(
   props: UseRelayNextJsProps,
   opts: { createClientEnvironment: () => Environment }
 ): { env: Environment; preloadedQuery?: AnyPreloadedQuery; CSN: boolean } {
+  const hydratedRef = useRef(false);
+
   const [relayEnvironment] = useState(() => {
     if (props.preloadedQuery?.environment) {
       return props.preloadedQuery.environment;
     }
 
     const env = opts.createClientEnvironment();
-    if (props.payload && props.payloadMeta && props.operationDescriptor) {
+    if (
+      !hydratedRef.current &&
+      props.payload &&
+      props.payloadMeta &&
+      props.operationDescriptor
+    ) {
+      hydratedRef.current = true;
       hydrateObject(props.payloadMeta, props.payload);
 
-      // After SSR, during initial render (hydration), the store is empty.
-      // `getInitialProps` from the server gives us data to "replay" the data
-      // fetching allowing us to "hydrate" the store, ensuring the initial
-      // render matches the server's.
       env.commitPayload(
         props.operationDescriptor,
         (props.payload as GraphQLSingularResponse).data!
@@ -32,26 +35,49 @@ export function useRelayNextjs(
     return env;
   });
 
-  const preloadedQuery = useMemo(() => {
+  const [preloadedQuery, setPreloadedQuery] = useState<
+    AnyPreloadedQuery | undefined
+  >(() => {
     if (props.preloadedQuery) {
-      // During SSR and client-side navigations this will be defined.
       return props.preloadedQuery;
     } else if (props.operationDescriptor) {
-      // During initial hydration we don't have a reference to the preloadedQuery
-      // from the server because it cannot be serialized. In that case we recreate
-      // it from store data.
       return loadQuery(
         relayEnvironment,
         props.operationDescriptor.request.node,
         props.operationDescriptor.request.variables,
         { fetchPolicy: 'store-or-network' }
       );
-    } else {
-      // If the page we landed on doesn't have these props defined it is not a
-      // page using relay-nextjs, so we should just return undefined.
-      return undefined;
     }
-  }, [props, relayEnvironment]);
+    return undefined;
+  });
+
+  const prevPreloadedQueryProp = useRef(props.preloadedQuery);
+
+  useEffect(() => {
+    if (
+      props.preloadedQuery &&
+      props.preloadedQuery !== prevPreloadedQueryProp.current
+    ) {
+      prevPreloadedQueryProp.current = props.preloadedQuery;
+      setPreloadedQuery((prev) => {
+        if (prev && prev !== props.preloadedQuery) {
+          prev.dispose();
+        }
+        return props.preloadedQuery;
+      });
+    }
+  }, [props.preloadedQuery]);
+
+  useEffect(() => {
+    return () => {
+      setPreloadedQuery((prev) => {
+        if (prev) {
+          prev.dispose();
+        }
+        return undefined;
+      });
+    };
+  }, []);
 
   return { env: relayEnvironment, preloadedQuery, CSN: props.CSN };
 }
