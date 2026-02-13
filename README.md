@@ -1,16 +1,10 @@
-<p align="center">
-  <b>Revere CRE is hiring! Interested in working on the cutting edge of frontend?</b>
-  <br>
-  <b>Reach out to <a href="mailto:eng-jobs@reverecre.com">eng-jobs@reverecre.com</a> for more information.</b>
-</p>
-
 <h1 align="center">
   Relay + Next.js
 </h1>
 
-[![npm version](https://badge.fury.io/js/relay-nextjs.svg)](https://badge.fury.io/js/relay-nextjs)
-![npm downloads](https://img.shields.io/npm/dm/relay-nextjs)
-![npm bundle size](https://img.shields.io/bundlephobia/minzip/relay-nextjs)
+[![npm version](https://badge.fury.io/js/@joshroy/relay-nextjs.svg)](https://badge.fury.io/js/@joshroy/relay-nextjs)
+![npm downloads](https://img.shields.io/npm/dm/@joshroy/relay-nextjs)
+![npm bundle size](https://img.shields.io/bundlephobia/minzip/@joshroy/relay-nextjs)
 
 <p align="center">
   <a href="https://reverecre.github.io/relay-nextjs"><b>Documentation</b></a> |
@@ -43,7 +37,7 @@ Note: `relay-nextjs` does not support [Nextjs 13 App Router](https://nextjs.org/
 Install using npm or your other favorite package manager:
 
 ```sh
-$ npm install relay-nextjs
+$ npm install @joshroy/relay-nextjs
 ```
 
 `relay-nextjs` must be configured in `_app` to properly intercept and handle
@@ -146,7 +140,7 @@ but you may fetch from a remote API as well.
 ```tsx
 // pages/_app.tsx
 import { RelayEnvironmentProvider } from 'react-relay/hooks';
-import { useRelayNextjs } from 'relay-nextjs/app';
+import { useRelayNextjs } from '@joshroy/relay-nextjs/app';
 import { getClientEnvironment } from '../lib/client_environment';
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -170,7 +164,7 @@ export default MyApp;
 
 ```tsx
 // src/pages/user/[uuid].tsx
-import { withRelay, RelayProps } from 'relay-nextjs';
+import { withRelay, RelayProps } from '@joshroy/relay-nextjs';
 import { graphql, usePreloadedQuery } from 'react-relay/hooks';
 
 // The $uuid variable is injected automatically from the route.

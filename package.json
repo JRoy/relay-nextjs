@@ -1,5 +1,5 @@
 {
-  "name": "relay-nextjs",
+  "name": "@joshroy/relay-nextjs",
   "version": "3.0.1",
   "description": "Use Relay in your Next.js apps!",
   "main": "index.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RevereCRE/relay-nextjs.git"
+    "url": "git+https://github.com/JRoy/relay-nextjs.git"
   },
   "keywords": [
     "relay",
@@ -22,26 +22,24 @@
   ],
   "author": "Ryan Delaney <rrdelaney@outlook.com>",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/RevereCRE/relay-nextjs/issues"
-  },
-  "homepage": "https://github.com/RevereCRE/relay-nextjs#readme",
   "devDependencies": {
     "@types/lodash.isequal": "^4.5.6",
-    "@types/node": "^14.14.41",
-    "@types/react": "^17.0.3",
-    "@types/react-dom": "^17.0.3",
-    "@types/react-relay": "^11.0.0",
-    "@types/relay-runtime": "^10.1.10",
-    "@types/serialize-javascript": "^5.0.0",
+    "@types/node": "^22.19.11",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.0",
+    "@types/react-relay": "^18.2.1",
+    "@types/relay-runtime": "^18.2.5",
+    "@types/serialize-javascript": "^5.0.4",
     "graphql": "^15.5.0",
-    "next": "^10.0.9",
+    "next": "^15.5.12",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "prettier": "^2.2.1",
     "typescript": "^5.0.4"
   },
   "dependencies": {
     "lodash.isequal": "^4.5.0",
-    "serialize-javascript": "^5.0.1"
+    "serialize-javascript": "^7.0.2"
   },
   "files": [
     "*.js",
