@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Environment } from 'react-relay';
 import { loadQuery } from 'react-relay';
 import type { GraphQLSingularResponse } from 'relay-runtime';
@@ -35,9 +35,7 @@ export function useRelayNextjs(
     return env;
   });
 
-  const [preloadedQuery, setPreloadedQuery] = useState<
-    AnyPreloadedQuery | undefined
-  >(() => {
+  const preloadedQuery = useMemo(() => {
     if (props.preloadedQuery) {
       return props.preloadedQuery;
     } else if (props.operationDescriptor) {
@@ -49,35 +47,18 @@ export function useRelayNextjs(
       );
     }
     return undefined;
-  });
+  }, [props.preloadedQuery, props.operationDescriptor, relayEnvironment]);
 
-  const prevPreloadedQueryProp = useRef(props.preloadedQuery);
+  const prevQueryRef = useRef<AnyPreloadedQuery | undefined>(undefined);
 
   useEffect(() => {
-    if (
-      props.preloadedQuery &&
-      props.preloadedQuery !== prevPreloadedQueryProp.current
-    ) {
-      prevPreloadedQueryProp.current = props.preloadedQuery;
-      setPreloadedQuery((prev) => {
-        if (prev && prev !== props.preloadedQuery) {
-          prev.dispose();
-        }
-        return props.preloadedQuery;
-      });
+    const prev = prevQueryRef.current;
+    prevQueryRef.current = preloadedQuery;
+    if (prev && prev !== preloadedQuery) {
+      prev.dispose();
     }
-  }, [props.preloadedQuery]);
+  }, [preloadedQuery]);
 
-  useEffect(() => {
-    return () => {
-      setPreloadedQuery((prev) => {
-        if (prev) {
-          prev.dispose();
-        }
-        return undefined;
-      });
-    };
-  }, []);
 
   return { env: relayEnvironment, preloadedQuery, CSN: props.CSN };
 }

@@ -175,17 +175,6 @@ export function withRelay<Props extends RelayProps, ServerSideProps extends {}>(
       return () => nextPreloadedQuery.dispose();
     }, [env, queryVariables, queryOptions]);
 
-    useEffect(() => {
-      return () => {
-        setPreloadedQuery((prev) => {
-          if (prev) {
-            prev.dispose();
-          }
-          return prev;
-        });
-      };
-    }, []);
-
     return preloadedQuery;
   }
 
